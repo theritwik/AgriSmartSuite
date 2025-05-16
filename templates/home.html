@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}AgriSmartSuite - Home{% endblock %}
+
+{% block content %}
+<div class="hero-section">
+    <div class="container text-center">
+        <h1 class="display-4">Welcome to AgriSmartSuite</h1>
+        <p class="lead">Your Intelligent Agriculture Assistant</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Crop Recommendation</h5>
+                    <p class="card-text">Get personalized crop recommendations based on soil conditions, climate, and environmental factors.</p>
+                    <ul class="list-unstyled">
+                        <li>✓ Soil nutrient analysis</li>
+                        <li>✓ Climate compatibility</li>
+                        <li>✓ Smart crop suggestions</li>
+                    </ul>
+                    <a href="/crop-recommendation" class="btn btn-primary">Get Recommendations</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 mb-4">
+            <div class="card feature-card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Yield Prediction</h5>
+                    <p class="card-text">Predict crop yields based on historical data, weather conditions, and agricultural inputs.</p>
+                    <ul class="list-unstyled">
+                        <li>✓ Data-driven predictions</li>
+                        <li>✓ Weather impact analysis</li>
+                        <li>✓ Area-based calculations</li>
+                    </ul>
+                    <a href="/yield-prediction" class="btn btn-primary">Predict Yield</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

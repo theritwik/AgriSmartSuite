@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Area & Crop Dropdowns</title>
+</head>
+<body>
+  <form>
+    <label>
+      Area:
+      <select id="areaSelect">
+        <option>Loading...</option>
+      </select>
+      <div id="areaError" style="color:red;"></div>
+    </label>
+    <br>
+    <label>
+      Crop:
+      <select id="cropSelect">
+        <option>Loading...</option>
+      </select>
+      <div id="cropError" style="color:red;"></div>
+    </label>
+  </form>
+  <script>
+    async function loadOptions() {
+      try {
+        const res = await fetch('/get_options');
+        if (!res.ok) throw new Error('Network error');
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        // Populate Area
+        const areaSelect = document.getElementById('areaSelect');
+        areaSelect.innerHTML = '';
+        data.areas.forEach(area => {
+          const opt = document.createElement('option');
+          opt.value = opt.textContent = area;
+          areaSelect.appendChild(opt);
+        });
+
+        // Populate Crop
+        const cropSelect = document.getElementById('cropSelect');
+        cropSelect.innerHTML = '';
+        data.crops.forEach(crop => {
+          const opt = document.createElement('option');
+          opt.value = opt.textContent = crop;
+          cropSelect.appendChild(opt);
+        });
+
+        document.getElementById('areaError').textContent = '';
+        document.getElementById('cropError').textContent = '';
+      } catch (err) {
+        document.getElementById('areaSelect').innerHTML = '';
+        document.getElementById('cropSelect').innerHTML = '';
+        document.getElementById('areaError').textContent = 'Failed to load available options';
+        document.getElementById('cropError').textContent = 'Failed to load available options';
+      }
+    }
+    window.addEventListener('DOMContentLoaded', loadOptions);
+  </script>
+</body>
+</html>

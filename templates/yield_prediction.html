@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Yield Prediction - AgriSmartSuite{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <h1 class="text-center mb-4">Crop Yield Prediction</h1>
+    
+    <div class="card bg-dark text-white">
+        <div class="card-body">
+            <h2 class="text-center mb-4">Enter Agricultural Parameters</h2>
+            <form action="/predict-yield" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="Year" class="form-label">Year</label>
+                        <input type="number" class="form-control form-control-dark" name="Year" value="2025" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="average_rain_fall_mm_per_year" class="form-label">Average Rainfall (mm/year)</label>
+                        <input type="number" step="0.01" class="form-control form-control-dark" name="average_rain_fall_mm_per_year" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="pesticides_tonnes" class="form-label">Pesticides (tonnes)</label>
+                        <input type="number" step="0.01" class="form-control form-control-dark" name="pesticides_tonnes" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="avg_temp" class="form-label">Average Temperature (°C)</label>
+                        <input type="number" step="0.01" class="form-control form-control-dark" name="avg_temp" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="Area" class="form-label">Area</label>
+                        <input type="text" class="form-control form-control-dark" name="Area" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="Item" class="form-label">Crop Type</label>
+                        <input type="text" class="form-control form-control-dark" name="Item" required>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-primary btn-lg">Predict Yield</button>
+                </div>
+            </form>
+
+            {% if prediction %}
+            <div class="alert alert-success mt-4 text-center">
+                <h4 class="alert-heading">Predicted Yield</h4>
+                <p class="mb-0">{{ prediction }} tonnes per hectare</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
