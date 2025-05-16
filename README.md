@@ -1,4 +1,4 @@
-# AgriSmartSuite-Smart-Archiculture-Solutions
+# AgriSmartSuite
 
 # 🌾 AgriSmartSuite - Smart Agriculture Solution
 
