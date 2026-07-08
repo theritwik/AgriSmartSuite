@@ -1,3 +1,4 @@
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import numpy as np
@@ -8,51 +9,46 @@ import pandas as pd
 # Import joblib for model loading
 from joblib import load
 
+# Resolve paths relative to this file so the app works regardless of the
+# directory it is launched from.
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+YIELD_DATASET = os.path.join(BASE_DIR, 'Crop_Yield_Prediction-main', 'yield_df.csv')
+
+
 def load_model(model_name, paths=None):
-    """
-    Attempts to load a model from multiple possible paths         # Calculate statistics with proper rounding and validation
-        def safe_float(value):
-            try:
-                return float(value) if pd.notnull(value) else 0.0
-            except:
-                return 0.0
-                
-        stats = {
-            'avg_rainfall': safe_float(yield_df['average_rain_fall_mm_per_year'].mean()),
-            'max_rainfall': safe_float(yield_df['average_rain_fall_mm_per_year'].max()),
-            'min_rainfall': safe_float(yield_df['average_rain_fall_mm_per_year'].min()),
-            'avg_temp': safe_float(yield_df['avg_temp'].mean()),
-            'max_temp': safe_float(yield_df['avg_temp'].max()),
-            'min_temp': safe_float(yield_df['avg_temp'].min()),
-            'avg_pesticides': safe_float(yield_df['pesticides_tonnes'].mean()),
-            'max_pesticides': safe_float(yield_df['pesticides_tonnes'].max()),
-            'min_pesticides': safe_float(yield_df['pesticides_tonnes'].min()),
-            'yield_stats': {
-                'avg_yield': safe_float(yield_df['hg/ha_yield'].mean()),
-                'max_yield': safe_float(yield_df['hg/ha_yield'].max()),
-                'min_yield': safe_float(yield_df['hg/ha_yield'].min())
-            }
+    """Load a model, trying joblib then pickle across several directories.
+
+    Args:
+        model_name: Base filename (without extension) of the model to load.
+        paths: Directories to search, in order. Defaults to the project root
+            and the yield-prediction subdirectory.
+
+    Returns:
+        The deserialized model object.
+
+    Raises:
+        RuntimeError: If the model cannot be loaded from any location.
     """
     if paths is None:
-        paths = ['.', 'Crop_Yield_Prediction-main']
-    
+        paths = [BASE_DIR, os.path.join(BASE_DIR, 'Crop_Yield_Prediction-main')]
+
     errors = []
     for path in paths:
         # Try joblib format
+        joblib_path = os.path.join(path, f"{model_name}.joblib")
         try:
-            model_path = f"{path}/{model_name}.joblib"
-            return load(model_path)
+            return load(joblib_path)
         except Exception as e:
-            errors.append(f"Failed to load {model_path}: {str(e)}")
-        
+            errors.append(f"Failed to load {joblib_path}: {str(e)}")
+
         # Try pickle format
+        pickle_path = os.path.join(path, f"{model_name}.pkl")
         try:
-            model_path = f"{path}/{model_name}.pkl"
-            with open(model_path, 'rb') as f:
+            with open(pickle_path, 'rb') as f:
                 return pickle.load(f)
         except Exception as e:
-            errors.append(f"Failed to load {model_path}: {str(e)}")
-    
+            errors.append(f"Failed to load {pickle_path}: {str(e)}")
+
     raise RuntimeError(f"Failed to load {model_name} from any location: {'; '.join(errors)}")
 
 # Load Crop Recommendation models
@@ -73,7 +69,7 @@ except Exception as e:
     traceback.print_exc()
 
 # Load and preprocess the yield dataset once when the app starts
-yield_df = pd.read_csv('Crop_Yield_Prediction-main/yield_df.csv')
+yield_df = pd.read_csv(YIELD_DATASET)
 
 # Clean and validate the data
 yield_df = yield_df.dropna()  # Remove rows with missing values
@@ -384,12 +380,17 @@ def get_available_options():
 @app.route('/get_options')
 def get_options():
     try:
-        df = pd.read_csv('Crop_Yield_Prediction-main/yield_df.csv')
-        areas = sorted(df['Area'].dropna().unique().tolist())
-        crops = sorted(df['Crop'].dropna().unique().tolist())
+        # The yield dataset stores the crop in the 'Item' column.
+        areas = sorted(yield_df['Area'].dropna().unique().tolist())
+        crops = sorted(yield_df['Item'].dropna().unique().tolist())
         return jsonify({'areas': areas, 'crops': crops})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Configuration is read from the environment so the same code can run in
+    # development and production without edits.
+    host = os.environ.get("FLASK_HOST", "127.0.0.1")
+    port = int(os.environ.get("FLASK_PORT", "5000"))
+    debug = os.environ.get("FLASK_DEBUG", "false").lower() in ("1", "true", "yes")
+    app.run(host=host, port=port, debug=debug)

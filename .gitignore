@@ -1,0 +1,43 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual environments
+venv/
+venv_crop/
+.venv/
+.testvenv/
+env/
+ENV/
+
+# ---- Node / frontend ----
+node_modules/
+agrismart-react/dist/
+*.local
+
+# ---- Installers / platform binaries (should never be committed) ----
+*.exe
+*.dll
+*.pyd
+*.so
+
+# ---- Editor / OS ----
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ---- Logs & env ----
+*.log
+.env
+.env.*
+!.env.example
